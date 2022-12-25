@@ -2,6 +2,7 @@ package threads.buffers;
 
 public class SharedBuffer implements Buffer {
     private int x = -1;
+    private boolean occupied = false;
 
     public int getX() {
         return x;
@@ -12,12 +13,29 @@ public class SharedBuffer implements Buffer {
     }
 
     @Override
-    public void addToBuffer(int x) {
+    public synchronized void addToBuffer(int x) throws InterruptedException {
+        while (occupied) {
+            System.out.println("Producer tries to write but buffer is full");
+            wait();
+        }
         setX(x);
+        System.out.println(Thread.currentThread() + " , producer added to shared buffer: " + x);
+        occupied = true;
+
+        notifyAll();
     }
 
     @Override
-    public int getFromBuffer() {
+    public synchronized int getFromBuffer() throws InterruptedException {
+        while (!occupied) {
+            System.out.println("Consumer tries to retrieve from buffer but buffer is empty");
+            wait();
+        }
+        System.out.println(Thread.currentThread() + " , consumer consumed from buffer: " + x);
+        occupied = false;
+
+        notifyAll();
+
         return getX();
     }
 }

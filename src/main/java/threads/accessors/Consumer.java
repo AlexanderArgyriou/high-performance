@@ -9,14 +9,18 @@ public class Consumer implements Runnable {
         this.buffer = buffer;
     }
 
-    public void consume() {
+    public void consume() throws InterruptedException {
         for (int i = 0; i < 100; ++i) {
-            System.out.println(Thread.currentThread() + " , consumer consumed from buffer: " + buffer.getFromBuffer());
+            buffer.getFromBuffer();
         }
     }
 
     @Override
     public void run() {
-        consume();
+        try {
+            consume();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
