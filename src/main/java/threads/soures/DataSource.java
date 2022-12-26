@@ -1,10 +1,12 @@
 package threads.soures;
 
+import static threads.ConstantCount.COUNT;
+
 public class DataSource {
-    private final int[] data = new int[100];
+    private final int[] data = new int[COUNT];
 
     public DataSource() {
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < COUNT; ++i) {
             data[i] = i;
         }
     }
