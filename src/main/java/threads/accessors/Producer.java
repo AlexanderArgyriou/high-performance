@@ -3,6 +3,8 @@ package threads.accessors;
 import threads.buffers.Buffer;
 import threads.soures.DataSource;
 
+import static threads.ConstantCount.COUNT;
+
 
 public class Producer implements Runnable {
     private final Buffer buffer;
@@ -13,15 +15,18 @@ public class Producer implements Runnable {
         this.dataSource = dataSource;
     }
 
-    public void produce() {
-        for (int i = 0; i < 100; ++i) {
+    public void produce() throws InterruptedException {
+        for (int i = 0; i < COUNT; ++i) {
             buffer.addToBuffer(dataSource.getData()[i]);
-            System.out.println(Thread.currentThread() + " , producer added to shared buffer: " + dataSource.getData()[i]);
         }
     }
 
     @Override
     public void run() {
-        produce();
+        try {
+            produce();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

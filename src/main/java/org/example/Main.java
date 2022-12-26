@@ -6,7 +6,6 @@ import threads.buffers.Buffer;
 import threads.buffers.SharedBuffer;
 import threads.soures.DataSource;
 
-import java.nio.BufferOverflowException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;

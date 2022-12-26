@@ -2,6 +2,8 @@ package threads.accessors;
 
 import threads.buffers.Buffer;
 
+import static threads.ConstantCount.COUNT;
+
 public class Consumer implements Runnable {
     private final Buffer buffer;
 
@@ -9,14 +11,18 @@ public class Consumer implements Runnable {
         this.buffer = buffer;
     }
 
-    public void consume() {
-        for (int i = 0; i < 100; ++i) {
-            System.out.println(Thread.currentThread() + " , consumer consumed from buffer: " + buffer.getFromBuffer());
+    public void consume() throws InterruptedException {
+        for (int i = 0; i < COUNT; ++i) {
+            buffer.getFromBuffer();
         }
     }
 
     @Override
     public void run() {
-        consume();
+        try {
+            consume();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
