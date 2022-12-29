@@ -4,5 +4,5 @@ public class Consts {
     private Consts() {
     }
 
-    public final static int SIZE = 600_000;
+    public final static int SIZE = 200_000;
 }

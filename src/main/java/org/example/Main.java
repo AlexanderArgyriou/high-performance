@@ -1,16 +1,15 @@
 package org.example;
 
 import java.security.SecureRandom;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.example.Consts.SIZE;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         int[] arr1 = new int[SIZE];
         int[] arr2 = new int[SIZE];
@@ -27,16 +26,29 @@ public class Main {
 
         int numOfThreads = 2;
         for ( int j = 0; j < 6; ++j ) {
-            long time = 0;
-            for ( int i = 0; i < 5; ++i ) {
+            long time = 0L;
+            for ( int i = 0; i < 20; ++i ) {
+                ExecutorService executorService = Executors.newFixedThreadPool( numOfThreads );
                 int[] sample = Arrays.copyOfRange( arr1, 0, arr1.length );
-                SharedResult sharedResult = new SharedResult();
+                SharedContext sharedContext = new SharedContext();
+                for ( int k = 0; k < sample.length; k += sample.length / 500 ) {
+                    sharedContext.addToJobPool( Arrays.copyOfRange( sample, k, k + sample.length / 500 ) );
+                }
                 start = System.currentTimeMillis();
-                new ForkJoinPool( numOfThreads ).invoke( new BubbleTask( sample, sample.length / 30, sharedResult ) );
+                for ( int t = 0; t < numOfThreads; t++ ) {
+                    executorService.submit( new BubbleTask( sharedContext ) );
+                }
+                executorService.shutdown();
+                executorService.awaitTermination( 1, TimeUnit.HOURS );
+
+                sharedContext.mergeAllSortedArraysAndGetResult();
                 end = System.currentTimeMillis();
                 time += end - start;
+
+                //Arrays.stream( sharedContext.mergeAllSortedArraysAndGetResult()).forEach( e -> System.out.print( e + " " ) );
+                //System.out.println();
             }
-            System.out.println( "parallel time with active threads : " + numOfThreads + ", ran 5 times with avg_time = " +  time / 5 + "ms" );
+            System.out.println( "parallel time with active threads : " + numOfThreads + ", ran 5 times with avg_time = " + time / 20 + "ms" );
             numOfThreads *= 2;
         }
 //
