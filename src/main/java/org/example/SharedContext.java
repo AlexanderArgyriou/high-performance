@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import static org.example.Consts.CHUNKS;
+
 public class SharedContext {
-    private final ArrayBlockingQueue<int[]> jobPool = new ArrayBlockingQueue<>( 500 );
+    private final ArrayBlockingQueue<int[]> jobPool = new ArrayBlockingQueue<>( CHUNKS );
     private List<int[]> doneJobs = new ArrayList<>();
 
     public ArrayBlockingQueue<int[]> getJobPool() {
@@ -28,7 +30,7 @@ public class SharedContext {
         jobPool.add( part );
     }
 
-    public synchronized int[] mergeAllSortedArraysAndGetResult() {
+    public int[] mergeAllSortedArraysAndGetResult() {
         if ( doneJobs.size() > 1 ) {
             int[] result = mergeTwoSortedArrays( doneJobs.get( 0 ), doneJobs.get( 1 ) );
             for ( int i = 2; i < doneJobs.size(); i++ ) {

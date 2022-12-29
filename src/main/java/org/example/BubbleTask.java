@@ -22,7 +22,7 @@ public class BubbleTask implements Runnable {
     }
 
     private void process(int[] arr) {
-        //System.out.println(Thread.currentThread().getName() + " assigned to sort: " + arr.length + " elements");
+        // System.out.println(Thread.currentThread().getName() + " assigned to sort: " + arr.length + " elements");
         BubbleSort.sort( arr );
         sharedContext.addToDone( arr );
     }
