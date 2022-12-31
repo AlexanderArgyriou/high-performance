@@ -16,9 +16,11 @@ public class Main {
             long time = 0;
             for ( int i = 0; i < tests; ++i ) {
                 int[] sample = Arrays.copyOfRange( arr, 0, arr.length );
+                ForkJoinPool forkJoinPool = new ForkJoinPool(threads);
                 long start = System.currentTimeMillis();
-                new ForkJoinPool(threads).invoke( new ParallelQuickSort( 0, arr.length - 1, sample ) );
+                forkJoinPool.invoke( new ParallelQuickSort( 0, arr.length - 1, sample ) );
                 long end = System.currentTimeMillis();
+                forkJoinPool.shutdown();
                 time += end - start;
                 //System.out.println( isSorted( sample ) );
             }
