@@ -12,24 +12,13 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
-
-//4 threads
-//Result "org.example.Sample.run":
-//        145.647 ±(99.9%) 26.328 ms/op [Average]
-//        (min, avg, max) = (120.948, 145.647, 181.042), stdev = 17.414
-//        CI (99.9%): [119.319, 171.974] (assumes normal distribution)
-//8 threads
-//Result "org.example.Sample.run":
-//        110.237 ±(99.9%) 4.193 ms/op [Average]
-//        (min, avg, max) = (107.040, 110.237, 115.932), stdev = 2.774
-//        CI (99.9%): [106.044, 114.431] (assumes normal distribution)
 
 @BenchmarkMode(Mode.AverageTime)
-@Warmup(iterations = 2, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 10, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 2, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(1)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class Sample {
@@ -37,16 +26,45 @@ public class Sample {
     @State(Scope.Benchmark)
     public static class Data {
         public int[] arr;
-        SecureRandom secureRandom = new SecureRandom();
 
         @Setup(Level.Invocation)
         public void setUp() {
-            arr = IntStream.range( 0, 3_000_000 ).map( i -> secureRandom.nextInt( 200_000 ) ).toArray();
+            arr = Arrays.copyOfRange( ArrHolder.arr, 0, ArrHolder.arr.length );
         }
     }
 
     @Benchmark
-    public void run(Data data) {
+    public void run1Thread(Data data) {
+        new ForkJoinPool( 1 ).invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
+    }
+
+    @Benchmark
+    public void run2Threads(Data data) {
+        new ForkJoinPool( 2 ).invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
+    }
+
+    @Benchmark
+    public void run4Threads(Data data) {
+        ForkJoinPool.commonPool().invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
+    }
+
+    @Benchmark
+    public void run8Threads(Data data) {
         new ForkJoinPool( 8 ).invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
+    }
+
+    @Benchmark
+    public void run16Threads(Data data) {
+        new ForkJoinPool( 16 ).invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
+    }
+
+    @Benchmark
+    public void run32Threads(Data data) {
+        new ForkJoinPool( 32 ).invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
+    }
+
+    @Benchmark
+    public void run64Threads(Data data) {
+        new ForkJoinPool( 64 ).invoke( new ParallelQuickSort( 0, data.arr.length - 1, data.arr ) );
     }
 }
